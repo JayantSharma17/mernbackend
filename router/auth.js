@@ -49,6 +49,7 @@ router.post('/signin', async (req, res) => {
         const emailExist = await User.findOne({ email: email });
         if (emailExist) {
             const isMatch = await bcrypt.compare(password, emailExist.password);
+            console.log("hello")
             if (isMatch) {
                 console.log(emailExist)
                 const token = await emailExist.generateAuthToken();
