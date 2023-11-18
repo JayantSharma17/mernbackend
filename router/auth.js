@@ -60,7 +60,7 @@ router.post('/signin', async (req, res) => {
                 // });
                 // const jwt_cookie = req.cookies.jwt;
                 // console.log(req.cookies.token);
-                res.status(201).json({ message: "Login successfully", response: emailExist });
+                res.status(201).json({ message: "Login successfully", response: emailExist, token: token });
                 console.log('"login successfully"');
             }
             else {
