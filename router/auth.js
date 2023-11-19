@@ -5,6 +5,9 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const authenticate = require('../middleware/authenticate');
 const Posts = require('../models/postSchema');
+const multer=require('multer');
+const path = require('path');
+const fs = require('fs'); // Node.js File System module
 
 
 
@@ -49,7 +52,6 @@ router.post('/signin', async (req, res) => {
         const emailExist = await User.findOne({ email: email });
         if (emailExist) {
             const isMatch = await bcrypt.compare(password, emailExist.password);
-            console.log("Jayant Sharma")
             if (isMatch) {
                 console.log(emailExist)
                 const token = await emailExist.generateAuthToken();
@@ -75,6 +77,57 @@ router.post('/signin', async (req, res) => {
     catch (e) {
         console.log(e)
         res.status(500).send(e);
+    }
+});
+
+const storage = multer.diskStorage({
+    destination:(req,file,cb)=>{
+        cb(null,'public/Images')
+    },
+    filename:(req,file,cb)=>{
+        cb(null,file.fieldname + "_" + Date.now() + path.extname(file.originalname))
+    }
+}); 
+const upload = multer({
+    storage:storage
+})
+
+router.post('/upload',upload.single('file'),(req,res)=>{
+    console.log(req.body.post_likes)
+    Posts.create({post_url:req.file.filename})
+    .then(result=>res.json(result))
+    .catch(err=>{res.json(err); console.log(err);})
+
+})
+
+router.post('/delete-post', async (req, res) => {
+    try {
+        const { filename } = req.body;
+
+        // Assuming you store images in 'public/Images' directory
+        const imagePath = path.join(__dirname, '../public/Images/', filename);
+        console.log(imagePath)
+
+        // Check if the file exists
+        fs.access(imagePath, fs.constants.F_OK, async (err) => {
+            if (err) {
+                return res.status(404).json({ message: 'Post not found' });
+            }
+
+            // Delete the file
+            fs.unlink(imagePath, async (unlinkErr) => {
+                if (unlinkErr) {
+                    return res.status(500).json({ message: 'Failed to delete Post', error: unlinkErr });
+                }
+
+                // Remove the image reference from the database
+                await Posts.deleteOne({ post_url: filename });
+
+                res.status(200).json({ message: 'Post deleted successfully' });
+            });
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Internal server error', error });
     }
 });
 

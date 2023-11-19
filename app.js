@@ -6,9 +6,12 @@ const app = express();
 
 const cors = require('cors');
 app.use(cors());
+app.use(express.static('public'))
 
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
+
+
 
 const connectDB = require('./db/conn');
 const User = require('./models/userSchema');
