@@ -81,10 +81,10 @@ router.post('/create-post', async (req, res) => {
         const imageBuffer = fs.readFileSync(path);
 
         // Convert the image buffer to a Base64 string
-        const base64Image = imageBuffer.toString('base64');
+        // const base64Image = imageBuffer.toString('base64');
         const postData = new Posts({ userId, desc });
         if (path && type) {
-            postData.photo.data = base64Image;
+            postData.photo.data = imageBuffer;
             postData.photo.contentType = type;
         }
         // console.log(req.fields)
