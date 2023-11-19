@@ -9,12 +9,15 @@ const postSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
+    desc:{
+        type: String,
+        // required: true
+    },
     date_time: {
         type: Date,
         default: Date.now
     }
 })
-
 
 const Posts = mongoose.model('Posts', postSchema);
 

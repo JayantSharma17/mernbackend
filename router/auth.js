@@ -74,14 +74,15 @@ router.post('/signin', async (req, res) => {
 //Create the post on website
 router.post('/create-post', async (req, res) => {
     try {
-        const { userId } = req.body;
-        const { photo } = req.files;
-        const postData = new Posts({ userId });
-        if (photo) {
-            postData.photo.data = fs.readFileSync(photo.path);
-            postData.photo.contentType = photo.type;
+        const { userId,desc } = req.fields;
+        const { path,type } = req.files.file;
+        console.log(path,type)
+        const postData = new Posts({ userId,desc });
+        if (path && type) {
+            postData.photo.data = fs.readFileSync(path);
+            postData.photo.contentType = type;
         }
-        console.log(photo)
+        // console.log(req.fields)
         const response = await postData.save();
         res.status(201).json({ message: "Post uploaded successfully.", response: response })
     }
@@ -91,7 +92,7 @@ router.post('/create-post', async (req, res) => {
     }
 })
 
-router.get('/create', async (req, res) => {
+router.get('/create-post', async (req, res) => {
     try {
         const response = await Posts.find({}).populate('userId');
         res.status(201).json({ message: "All Posts", response: response })
