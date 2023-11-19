@@ -107,6 +107,19 @@ router.get('/create-post', async (req, res) => {
         res.status(500).json({ error: e, message: 'Unable to fetch all Posts.' })
     }
 })
+router.get('/show-photo/:pid', async (req, res) => {
+    try {
+        const users = await Posts.findById(req.params.pid).select("photo");
+        if (users.photo.data) {
+          res.set("Content-type", users.photo.contentType);
+          return res.status(200).send(users.photo.data);
+        }
+    }
+    catch (e) {
+        console.log(e)
+        res.status(500).json({ error: e, message: 'Unable to fetch all Posts.' })
+    }
+})
 //______________________________________________________________________________________________________________________
 // User authentication
 router.get('/about', authenticate, (req, res) => {
