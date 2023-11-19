@@ -5,18 +5,16 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const authenticate = require('../middleware/authenticate');
 const Posts = require('../models/postSchema');
-
-
-
-
+const formidable = require('express-formidable');
+const fs = require('fs');
 
 router.get('/', (req, res) => {
-    // res.cookie('jwt', '4564843513', { httpOnly: false, secure: true, maxAge: 60000 });
     const jwt_cookie = req.cookies.jwt;
     console.log(req.cookies);
     res.send('This is router home');
 })
-
+//______________________________________________________________________________________________________________________
+// Create Account API
 router.post('/register', async (req, res) => {
     const { name, user_name, email, password } = req.body;
     if (!name || !user_name || !email || !password) {
@@ -44,7 +42,8 @@ router.post('/register', async (req, res) => {
         res.status(500).json({ error: e, message: 'Registration unsuccesfull' })
     }
 })
-
+//______________________________________________________________________________________________________________________
+// Login API
 router.post('/signin', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -55,13 +54,6 @@ router.post('/signin', async (req, res) => {
                 console.log(emailExist)
                 const token = await emailExist.generateAuthToken();
                 console.log(token);
-                // res.cookie('jwt',token, { httpOnly: false, secure: true, maxAge: 604800000 });
-                // res.cookie("token", token, {
-                //     withCredentials: true,
-                //     httpOnly: false,
-                // });
-                // const jwt_cookie = req.cookies.jwt;
-                // console.log(req.cookies.token);
                 res.status(201).json({ message: "Login successfully", response: emailExist, token: token });
                 console.log('"login successfully"');
             }
@@ -78,34 +70,37 @@ router.post('/signin', async (req, res) => {
         res.status(500).send(e);
     }
 });
-
+//______________________________________________________________________________________________________________________
 //Create the post on website
-router.post('/create', async (req, res) => {
-    const { post_url, userId } = req.body;
-
+router.post('/create-post', formidable(), async (req, res) => {
     try {
-        const postData = new Posts({ post_url, userId });
+        const { userId } = req.body;
+        const { photo } = req.files;
+        const postData = new Posts({ userId });
+        if (photo) {
+            postData.photo.data = fs.readFileSync(photo.path);
+            postData.photo.contentType = photo.type;
+          }
         const response = await postData.save();
         res.status(201).json({ message: "Post uploaded successfully.", response: response })
-
     }
     catch (e) {
         console.log(e)
         res.status(500).json({ error: e, message: 'Post not uploaded' })
     }
 })
+
 router.get('/create', async (req, res) => {
     try {
         const response = await Posts.find({}).populate('userId');
         res.status(201).json({ message: "All Posts", response: response })
-
     }
     catch (e) {
         console.log(e)
         res.status(500).json({ error: e, message: 'Unable to fetch all Posts.' })
     }
 })
-
+//______________________________________________________________________________________________________________________
 // User authentication
 router.get('/about', authenticate, (req, res) => {
     console.log('about page')
