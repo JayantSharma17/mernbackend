@@ -72,7 +72,7 @@ router.post('/signin', async (req, res) => {
 });
 //______________________________________________________________________________________________________________________
 //Create the post on website
-router.post('/create-post', formidable(), async (req, res) => {
+router.post('/create-post', async (req, res) => {
     try {
         const { userId } = req.body;
         const { photo } = req.files;
@@ -80,7 +80,8 @@ router.post('/create-post', formidable(), async (req, res) => {
         if (photo) {
             postData.photo.data = fs.readFileSync(photo.path);
             postData.photo.contentType = photo.type;
-          }
+        }
+        console.log(photo)
         const response = await postData.save();
         res.status(201).json({ message: "Post uploaded successfully.", response: response })
     }
