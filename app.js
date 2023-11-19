@@ -11,8 +11,8 @@ app.use(cors());
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
-const formidable = require('express-formidable');
-app.use(formidable())
+// const formidable = require('express-formidable');
+// app.use(formidable())
 
 
 

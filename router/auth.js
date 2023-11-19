@@ -72,7 +72,7 @@ router.post('/signin', async (req, res) => {
 });
 //______________________________________________________________________________________________________________________
 //Create the post on website
-router.post('/create-post', async (req, res) => {
+router.post('/create-post',formidable(), async (req, res) => {
     try {
         const { userId, desc } = req.fields;
         const { path, type } = req.files.file;
