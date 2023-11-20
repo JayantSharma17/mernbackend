@@ -7,6 +7,7 @@ const authenticate = require('../middleware/authenticate');
 const Posts = require('../models/postSchema');
 const formidable = require('express-formidable');
 const fs = require('fs');
+const Comments = require('../models/commentSchema');
 
 router.get('/', (req, res) => {
     const jwt_cookie = req.cookies.jwt;
@@ -96,7 +97,8 @@ router.post('/create-post',formidable(), async (req, res) => {
         res.status(500).json({ error: e, message: 'Post not uploaded' })
     }
 })
-
+//______________________________________________________________________________________________________________________
+// Fetch all the Posts
 router.get('/create-post', async (req, res) => {
     try {
         const response = await Posts.find({}).populate('userId');
@@ -107,6 +109,8 @@ router.get('/create-post', async (req, res) => {
         res.status(500).json({ error: e, message: 'Unable to fetch all Posts.' })
     }
 })
+//______________________________________________________________________________________________________________________
+// Showing pic on frontend
 router.get('/show-photo/:pid', async (req, res) => {
     try {
         const users = await Posts.findById(req.params.pid).select("photo");
@@ -117,9 +121,22 @@ router.get('/show-photo/:pid', async (req, res) => {
     }
     catch (e) {
         console.log(e)
-        res.status(500).json({ error: e, message: 'Unable to fetch all Posts.' })
+        res.status(500).json({ error: e, message: 'Unable to display Image' })
     }
 })
+// Write Comment API
+router.post('/write-comment', async (req, res) => {
+    try {
+        const { postId, userId,comment } = req.body;
+        const commentData = new Comments({ postId, userId,comment });
+        const response = await commentData.save();
+        res.status(201).json({ message: "Comment uploaded successfully.", response: response })
+    }
+    catch (e) {
+        console.log(e)
+        res.status(500).send(e);
+    }
+});
 //______________________________________________________________________________________________________________________
 // User authentication
 router.get('/about', authenticate, (req, res) => {
