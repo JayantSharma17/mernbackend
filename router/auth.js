@@ -36,7 +36,6 @@ router.post('/register', async (req, res) => {
         //middleware password hashing working here from userSchema
         const response = await userdata.save();
         res.status(201).json({ message: "Registration successfull.", response: response })
-
     }
     catch (e) {
         console.log(e)
@@ -80,7 +79,6 @@ router.post('/create-post',formidable(), async (req, res) => {
         console.log(path, type)
         // Read the image file as a buffer
         const imageBuffer = fs.readFileSync(path);
-
         // Convert the image buffer to a Base64 string
         // const base64Image = imageBuffer.toString('base64');
         const postData = new Posts({ userId, desc });
