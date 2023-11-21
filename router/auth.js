@@ -72,7 +72,7 @@ router.post('/signin', async (req, res) => {
 });
 //______________________________________________________________________________________________________________________
 //Create the post on website
-router.post('/create-post',formidable(), async (req, res) => {
+router.post('/create-post', formidable(), async (req, res) => {
     try {
         const { userId, desc } = req.fields;
         const { path, type } = req.files.file;
@@ -114,8 +114,8 @@ router.get('/show-photo/:pid', async (req, res) => {
     try {
         const users = await Posts.findById(req.params.pid).select("photo");
         if (users.photo.data) {
-          res.set("Content-type", users.photo.contentType);
-          return res.status(200).send(users.photo.data);
+            res.set("Content-type", users.photo.contentType);
+            return res.status(200).send(users.photo.data);
         }
     }
     catch (e) {
@@ -126,8 +126,8 @@ router.get('/show-photo/:pid', async (req, res) => {
 // Write Comment API
 router.post('/write-comment', async (req, res) => {
     try {
-        const { postId, userId,comment } = req.body;
-        const commentData = new Comments({ postId, userId,comment });
+        const { postId, userId, comment } = req.body;
+        const commentData = new Comments({ postId, userId, comment });
         const response = await commentData.save();
         res.status(201).json({ message: "Comment uploaded successfully.", response: response })
     }
@@ -136,6 +136,23 @@ router.post('/write-comment', async (req, res) => {
         res.status(500).send(e);
     }
 });
+//______________________________________________________________________________________________________________________
+// get all comment for a post
+router.get('/allcomments/:pid', async (req, res) => {
+    try {
+        const response = await Comments.find({ postId: req.params.pid })
+            .populate({
+                path: 'userId',
+                select: 'user_name' // Select the 'user_name' field from the User schema
+            });
+        res.status(201).json({ message: "All comments", response: response })
+    }
+    catch (e) {
+        console.log(e)
+        res.status(500).json({ error: e, message: 'Unable to fetch Comments' })
+    }
+})
+
 //______________________________________________________________________________________________________________________
 // User authentication
 router.get('/about', authenticate, (req, res) => {
