@@ -20,6 +20,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    category:{
+        type: String,
+        default:'all'
+    },
     date_time: {
         type: Date,
         default: Date.now
