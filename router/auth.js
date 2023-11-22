@@ -139,6 +139,7 @@ router.post('/write-comment', async (req, res) => {
 //______________________________________________________________________________________________________________________
 // get all comment for a post
 router.get('/allcomments/:pid', async (req, res) => {
+    console.log(req.params.pid )
     try {
         const response = await Comments.find({ postId: req.params.pid })
             .populate({
