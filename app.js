@@ -1,6 +1,9 @@
 const dotenv = require('dotenv');
 dotenv.config({ path: './config.env' });
 
+const connectDB = require('./db/conn');
+connectDB();
+
 const express = require('express');
 const app = express();
 
@@ -16,13 +19,12 @@ app.use(cookieParser());
 
 
 
-const connectDB = require('./db/conn');
 const User = require('./models/userSchema');
 const router = require('./router/auth');
 
 
 
-connectDB();
+
 
 
 const PORT = process.env.PORT;
