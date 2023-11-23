@@ -109,6 +109,19 @@ router.get('/create-post', async (req, res) => {
     }
 })
 //______________________________________________________________________________________________________________________
+// Fetch all the Posts of particular user
+router.get('/userpost/:uid', async (req, res) => {
+    try {
+        // const cat=req.params.cat;
+        const response = await Posts.find(req.params.uid).populate('userId').sort({ date_time: -1 });
+        res.status(201).json({ message: "All Posts of individual user", response: response })
+    }
+    catch (e) {
+        console.log(e)
+        res.status(500).json({ error: e, message: 'Unable to fetch user personal Posts.' })
+    }
+})
+//______________________________________________________________________________________________________________________
 // Showing pic on frontend
 router.get('/show-photo/:pid', async (req, res) => {
     try {
