@@ -159,7 +159,7 @@ router.get('/allcomments/:pid', async (req, res) => {
             .populate({
                 path: 'userId',
                 select: 'user_name' // Select the 'user_name' field from the User schema
-            });
+            }).sort({ date_time: -1 });
         res.status(201).json({ message: "All comments", response: response })
     }
     catch (e) {
