@@ -113,7 +113,7 @@ router.get('/create-post', async (req, res) => {
 router.get('/userpost/:uid', async (req, res) => {
     try {
         // const cat=req.params.cat;
-        const response = await Posts.find(req.params.uid).populate('userId').sort({ date_time: -1 });
+        const response = await Posts.find({userId:req.params.uid}).populate('userId').sort({ date_time: -1 });
         res.status(201).json({ message: "All Posts of individual user", response: response })
     }
     catch (e) {
