@@ -206,8 +206,19 @@ router.delete('/delete-comment/:commentId', async (req, res) => {
         res.status(500).json({ error: 'Failed to delete comment' });
     }
 });
-
-
+//______________________________________________________________________________________________________________________
+// DELETE endpoint to delete a post with its comments
+router.delete('/delete-post/:postId', async (req, res) => {
+    const postId = req.params.postId;
+    try {
+        await Comments.deleteMany({ postId });
+        await Posts.findByIdAndDelete(postId);
+        res.status(200).json({ message: 'Post and associated comments deleted successfully.' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Error deleting post and comments.' });
+    }
+});
 //______________________________________________________________________________________________________________________
 // User authentication
 router.get('/about', authenticate, (req, res) => {
