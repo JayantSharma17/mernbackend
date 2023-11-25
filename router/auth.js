@@ -186,6 +186,27 @@ router.get('/allcomments/:pid', async (req, res) => {
         res.status(500).json({ error: e, message: 'Unable to fetch Comments' })
     }
 })
+//______________________________________________________________________________________________________________________
+// Delete Comment API
+router.delete('/delete-comment/:commentId', async (req, res) => {
+    try {
+        const commentId = req.params.commentId;
+        
+        // Check if the comment exists before attempting to delete
+        const comment = await Comments.findById(commentId);
+        if (!comment) {
+            return res.status(404).json({ message: 'Comment not found' });
+        }
+
+        // If the comment exists, proceed with deletion
+        await Comments.findByIdAndDelete(commentId);
+        res.status(200).json({ message: 'Comment deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to delete comment' });
+    }
+});
+
 
 //______________________________________________________________________________________________________________________
 // User authentication
