@@ -43,6 +43,25 @@ router.post('/register', async (req, res) => {
     }
 })
 //______________________________________________________________________________________________________________________
+// Partial Update Account API without updating password
+router.patch('/update/:userId', async (req, res) => {
+    const userId = req.params.userId;
+    const { name, user_name, email } = req.body;
+    
+    try {
+        const updatedUser = await User.findByIdAndUpdate(userId, { name, user_name, email }, { new: true });
+        
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json({ message: 'User details updated successfully', user: updatedUser });
+    } catch (e) {
+        console.log(e);
+        res.status(500).json({ error: e, message: 'Failed to update user details' });
+    }
+});
+//______________________________________________________________________________________________________________________
 // Login API
 router.post('/signin', async (req, res) => {
     try {
