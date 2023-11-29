@@ -116,10 +116,10 @@ router.post('/create-post', formidable(), async (req, res) => {
 })
 //______________________________________________________________________________________________________________________
 // Fetch all the Posts
-router.get('/create-post', async (req, res) => {
+router.get('/create-post/:category', async (req, res) => {
     try {
         // const cat=req.params.cat;
-        const response = await Posts.find({}).populate('userId').sort({ date_time: -1 });
+        const response = await Posts.find({category:req.params.category}).populate('userId').sort({ date_time: -1 });
         res.status(201).json({ message: "All Posts", response: response })
     }
     catch (e) {
