@@ -115,11 +115,24 @@ router.post('/create-post', formidable(), async (req, res) => {
     }
 })
 //______________________________________________________________________________________________________________________
-// Fetch all the Posts
+// Fetch all the Posts with category wise
 router.get('/create-post/:category', async (req, res) => {
     try {
         // const cat=req.params.cat;
         const response = await Posts.find({category:req.params.category}).populate('userId').sort({ date_time: -1 });
+        res.status(201).json({ message: "All Posts", response: response })
+    }
+    catch (e) {
+        console.log(e)
+        res.status(500).json({ error: e, message: 'Unable to fetch all Posts.' })
+    }
+})
+//______________________________________________________________________________________________________________________
+// Fetch all the Posts only
+router.get('/create-post', async (req, res) => {
+    try {
+        // const cat=req.params.cat;
+        const response = await Posts.find({}).populate('userId').sort({ date_time: -1 });
         res.status(201).json({ message: "All Posts", response: response })
     }
     catch (e) {
