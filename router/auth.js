@@ -93,14 +93,14 @@ router.post('/signin', async (req, res) => {
 //Create the post on website
 router.post('/create-post', formidable(), async (req, res) => {
     try {
-        const { userId, desc } = req.fields;
+        const { userId, desc,category } = req.fields;
         const { path, type } = req.files.file;
         console.log(path, type)
         // Read the image file as a buffer
         const imageBuffer = fs.readFileSync(path);
         // Convert the image buffer to a Base64 string
         // const base64Image = imageBuffer.toString('base64');
-        const postData = new Posts({ userId, desc });
+        const postData = new Posts({ userId, desc,category });
         if (path && type) {
             postData.photo.data = imageBuffer;
             postData.photo.contentType = type;
