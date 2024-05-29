@@ -9,6 +9,18 @@ const formidable = require('express-formidable');
 const fs = require('fs');
 const Comments = require('../models/commentSchema');
 
+const nodemailer = require("nodemailer");
+const transporter = nodemailer.createTransport({
+    // host: "smtp.ethereal.email",
+    service: 'gmail',
+    port: 465,
+    secure: true, // Use `true` for port 465, `false` for all other ports
+    auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASS,
+    },
+});
+
 router.get('/', (req, res) => {
     const jwt_cookie = req.cookies.jwt;
     console.log(req.cookies);
@@ -47,10 +59,10 @@ router.post('/register', async (req, res) => {
 router.patch('/update/:userId', async (req, res) => {
     const userId = req.params.userId;
     const { name, user_name, email } = req.body;
-    
+
     try {
         const updatedUser = await User.findByIdAndUpdate(userId, { name, user_name, email }, { new: true });
-        
+
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -93,14 +105,14 @@ router.post('/signin', async (req, res) => {
 //Create the post on website
 router.post('/create-post', formidable(), async (req, res) => {
     try {
-        const { userId, desc,category } = req.fields;
+        const { userId, desc, category } = req.fields;
         const { path, type } = req.files.file;
         console.log(path, type)
         // Read the image file as a buffer
         const imageBuffer = fs.readFileSync(path);
         // Convert the image buffer to a Base64 string
         // const base64Image = imageBuffer.toString('base64');
-        const postData = new Posts({ userId, desc,category });
+        const postData = new Posts({ userId, desc, category });
         if (path && type) {
             postData.photo.data = imageBuffer;
             postData.photo.contentType = type;
@@ -119,7 +131,7 @@ router.post('/create-post', formidable(), async (req, res) => {
 router.get('/create-post/:category', async (req, res) => {
     try {
         // const cat=req.params.cat;
-        const response = await Posts.find({category:req.params.category}).populate('userId').sort({ date_time: -1 });
+        const response = await Posts.find({ category: req.params.category }).populate('userId').sort({ date_time: -1 });
         res.status(201).json({ message: "All Posts", response: response })
     }
     catch (e) {
@@ -145,7 +157,7 @@ router.get('/create-post', async (req, res) => {
 router.get('/userpost/:uid', async (req, res) => {
     try {
         // const cat=req.params.cat;
-        const response = await Posts.find({userId:req.params.uid}).populate('userId').sort({ date_time: -1 });
+        const response = await Posts.find({ userId: req.params.uid }).populate('userId').sort({ date_time: -1 });
         res.status(201).json({ message: "All Posts of individual user", response: response })
     }
     catch (e) {
@@ -204,7 +216,7 @@ router.get('/allcomments/:pid', async (req, res) => {
 router.delete('/delete-comment/:commentId', async (req, res) => {
     try {
         const commentId = req.params.commentId;
-        
+
         // Check if the comment exists before attempting to delete
         const comment = await Comments.findById(commentId);
         if (!comment) {
@@ -239,9 +251,26 @@ router.get('/about', authenticate, (req, res) => {
     res.send(req.rootUser)
 })
 // Node Mailer for Portfolio site
-router.post('/sendmail',(req, res) => {
-    console.log('about page')
-    res.send('hi')
+router.post('/sendmail', async (req, res) => {
+    try {
+        const { name, email, ph, msg } = req.body;
+        console.log(name, email, ph, msg);
+
+        const info = await transporter.sendMail({
+            from: `${name} <${email}>`, // sender address
+            to: "mejayantsh@gmail.com", // list of receivers
+            subject: "📨Portfolio message", // Subject line
+            text: `${msg}`, // plain text body
+            html: `<p>${msg}</p><br><b>Phone no: ${ph}</b><br><b>Email: ${email}</b>`, // html body
+        });
+
+        console.log("Message sent: %s", info.messageId);
+        res.status(200).json({ message: 'Email send successfully' });
+    }
+    catch (e) {
+        console.log(e)
+        res.status(500).json({ message: 'Email not send' });
+    }
 })
 
 module.exports = router;
