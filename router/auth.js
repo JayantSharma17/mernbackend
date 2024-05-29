@@ -238,5 +238,10 @@ router.get('/about', authenticate, (req, res) => {
     console.log('about page')
     res.send(req.rootUser)
 })
+// Node Mailer for Portfolio site
+router.post('/sendmail',(req, res) => {
+    console.log('about page')
+    res.send('hi')
+})
 
 module.exports = router;
